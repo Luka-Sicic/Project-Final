@@ -15,6 +15,6 @@ public class Gun : Weapon
         );
 
         bullet.GetComponent<Rigidbody2D>().linearVelocity =
-            firePoint.up * bulletSpeed;
+            firePoint.right * bulletSpeed;
     }
 }

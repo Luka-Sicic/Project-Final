@@ -10,19 +10,12 @@ public class Shotgun : Weapon
 
     public override void Fire()
     {
-        for (int i = 0; i < pelletCount; i++)
+        // Fires only one bullet in the direction of the firePoint
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        if (rb != null)
         {
-            float angleOffset = Random.Range(-spreadAngle, spreadAngle);
-            // Apply rotation to the firePoint's up direction
-            Quaternion rotation = Quaternion.Euler(0, 0, angleOffset);
-            Vector2 bulletDirection = rotation * firePoint.up;
-
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation * rotation);
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = bulletDirection * bulletSpeed;
-            }
+            rb.linearVelocity = firePoint.right * bulletSpeed;
         }
     }
 }

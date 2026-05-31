@@ -5,9 +5,22 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
     public Gun gun;
     public Rigidbody2D rb;
+    public Animator animator;
 
     Vector2 moveDirection;
-    Vector2 mousePosition; // This will now correctly store the value for FixedUpdate
+    Vector2 mousePosition;
+
+    // Animator parameter hash
+    private static readonly int IsWalkingHash = Animator.StringToHash("IsWalking");
+
+    void Start()
+    {
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (animator == null) animator = GetComponent<Animator>();
+        
+        // Ensure Rigidbody is set to Interpolate for smooth movement
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+    }
 
     void Update()
     {
@@ -19,16 +32,22 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
             gun.Fire();
 
-        // 2. Sample Mouse Position (Remove 'Vector2' here to fix variable shadowing)
+        // 2. Sample Mouse Position
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // 3. Update Animator
+        if (animator != null)
+        {
+            animator.SetBool(IsWalkingHash, moveDirection.magnitude > 0);
+        }
     }
 
     void FixedUpdate()
     {
-        // 3. Apply Velocity
+        // 4. Apply Velocity
         rb.linearVelocity = moveDirection * moveSpeed;
 
-        // 4. Apply Rotation in FixedUpdate
+        // 5. Apply Rotation in FixedUpdate
         Vector2 lookDirection = mousePosition - rb.position;
         float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
         rb.MoveRotation(angle);

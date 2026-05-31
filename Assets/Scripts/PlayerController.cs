@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public Gun gun;
+    public Weapon weapon;
     public Rigidbody2D rb;
     public Animator animator;
 
@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetAxisRaw("Vertical");
         moveDirection = new Vector2(moveX, moveY).normalized;
 
-        if (Input.GetMouseButtonDown(0))
-            gun.Fire();
+        if (Input.GetMouseButtonDown(0) && weapon != null)
+            weapon.Fire();
 
         // 2. Sample Mouse Position
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -40,6 +40,19 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool(IsWalkingHash, moveDirection.magnitude > 0);
         }
+    }
+
+    public void EquipWeapon(Weapon newWeapon)
+    {
+        if (weapon != null)
+        {
+            Destroy(weapon.gameObject);
+        }
+
+        weapon = newWeapon;
+        weapon.transform.SetParent(transform);
+        weapon.transform.localPosition = Vector3.zero;
+        weapon.transform.localRotation = Quaternion.identity;
     }
 
     void FixedUpdate()

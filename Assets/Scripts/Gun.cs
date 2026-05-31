@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class Gun : MonoBehaviour
+public class Gun : Weapon
 {
     public GameObject Bullet;
     public Transform firePoint;
     public float bulletSpeed = 20f;
 
-    public void Fire()
+    public override void Fire()
     {
         GameObject bullet = Instantiate(
             Bullet,

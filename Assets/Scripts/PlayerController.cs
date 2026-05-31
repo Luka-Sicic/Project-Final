@@ -15,23 +15,18 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetAxisRaw("Vertical");
 
         if (Input.GetMouseButtonDown(0))
-        {
             gun.Fire();
-        }
 
         moveDirection = new Vector2(moveX, moveY).normalized;
 
-        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 lookDirection = mousePosition - rb.position;
+        float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
+        rb.MoveRotation(angle);
     }
 
     void FixedUpdate()
     {
         rb.linearVelocity = moveDirection * moveSpeed;
-
-        Vector2 lookDirection = mousePosition - rb.position;
-
-        float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
-
-        rb.rotation = angle;
     }
 }

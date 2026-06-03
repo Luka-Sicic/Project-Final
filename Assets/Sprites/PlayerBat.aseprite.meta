@@ -130,7 +130,7 @@ ScriptedImporter:
   - name: PlayerBat
     originalName: 
     pivot: {x: 0.51282054, y: -0.012658228}
-    alignment: 9
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:

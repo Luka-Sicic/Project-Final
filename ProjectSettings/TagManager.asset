@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -11,10 +11,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Walls
+  - Decor
+  - Player
   - 
   - 
   - 
@@ -41,3 +41,24 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 3876302607
+    locked: 0
+  - name: Collidable
+    uniqueID: 1264760449
+    locked: 0
+  - name: Walls
+    uniqueID: 3325596079
+    locked: 0
+  - name: Pickup
+    uniqueID: 2522254557
+    locked: 0
+  - name: Enemy
+    uniqueID: 10325289
+    locked: 0
+  - name: Player
+    uniqueID: 2087395359
+    locked: 0
+  m_RenderingLayers:
+  - Default
+  m_MigratedRenderPipelines: []

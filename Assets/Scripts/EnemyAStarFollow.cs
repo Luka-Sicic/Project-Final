@@ -7,109 +7,98 @@ namespace Project.Scripts
     [RequireComponent(typeof(AIDestinationSetter))]
     public class EnemyAStarFollow : MonoBehaviour
     {
-        [Header("Chase Settings")]
-        [Tooltip("The range within which the enemy will start following the player.")]
+        [Header("Detection")]
         public float chaseRange = 5f;
-
-        [Header("Detection Settings")]
         public float fovAngle = 180f;
         public LayerMask obstacleLayer;
+        
+        [Header("Memory")]
+        [Tooltip("Seconds to keep chasing after losing line of sight.")]
+        public float memoryTime = 1.5f;
 
-        private Transform _playerTransform;
-        private AIDestinationSetter _destinationSetter;
+        [Header("Visuals")]
+        [Tooltip("Offset added to rotation. If the sprite points its 'side' at the player, adjust this (usually 90 or -90).")]
+        public float rotationOffset = -90f;
+
+        private Transform _player;
+        private AIDestinationSetter _setter;
         private AIPath _aiPath;
+        private SpriteRenderer _sprite;
         private Animator _animator;
-        private SpriteRenderer _spriteRenderer;
+        private float _memoryTimer;
 
-        private void Start()
+        void Start()
         {
-            // Detect GameObject with tag 'Player'
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                _playerTransform = player.transform;
-            }
-            else
-            {
-                Debug.LogWarning($"[EnemyAStarFollow] Player not found with tag 'Player' on {gameObject.name}");
-            }
-
-            // Cache components with null checks
-            _destinationSetter = GetComponent<AIDestinationSetter>();
+            _player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            _setter = GetComponent<AIDestinationSetter>();
             _aiPath = GetComponent<AIPath>();
+            _sprite = GetComponent<SpriteRenderer>();
             _animator = GetComponent<Animator>();
-            _spriteRenderer = GetComponent<SpriteRenderer>();
 
-            if (_destinationSetter == null) Debug.LogWarning($"[EnemyAStarFollow] AIDestinationSetter component missing on {gameObject.name}");
-            
             if (_aiPath != null)
             {
+                // Disable AIPath's internal rotation so we can handle it manually with the offset.
                 _aiPath.enableRotation = false;
-            }
-            else
-            {
-                Debug.LogWarning($"[EnemyAStarFollow] AIPath component missing on {gameObject.name}");
             }
 
             transform.rotation = Quaternion.identity;
         }
 
-        private void Update()
+        void Update()
         {
-            UpdateChaseLogic();
-            UpdateAnimationAndSprite();
-        }
+            if (_player == null || _setter == null) return;
 
-        private void UpdateChaseLogic()
-        {
-            if (_playerTransform == null || _destinationSetter == null || _spriteRenderer == null) return;
+            float dist = Vector2.Distance(transform.position, _player.position);
+            bool canSee = dist <= chaseRange;
 
-            // Calculate distance and direction to player
-            Vector2 position = transform.position;
-            Vector2 playerPosition = _playerTransform.position;
-            float distance = Vector2.Distance(position, playerPosition);
-
-            if (distance > chaseRange)
+            if (canSee)
             {
-                _destinationSetter.target = null;
-                return;
+                Vector2 dirToPlayer = ((Vector2)_player.position - (Vector2)transform.position).normalized;
+                
+                // Determine 'forward' based on the transform's current rotation minus the offset.
+                float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
+                Vector2 forward = new Vector2(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle));
+
+                if (Vector2.Angle(forward, dirToPlayer) > fovAngle * 0.5f)
+                {
+                    canSee = false;
+                }
+                else if (Physics2D.Raycast(transform.position, dirToPlayer, dist, obstacleLayer))
+                {
+                    canSee = false;
+                }
             }
 
-            Vector2 directionToPlayer = (playerPosition - position).normalized;
-
-            // Determine 'forward' vector
-            Vector2 forward = _spriteRenderer.flipX ? Vector2.left : Vector2.right;
-
-            // Check if in FOV
-            if (Vector2.Angle(forward, directionToPlayer) <= fovAngle * 0.5f)
+            if (canSee)
             {
-                // Perform Raycast for obstacles
-                RaycastHit2D hit = Physics2D.Raycast(position, directionToPlayer, distance, obstacleLayer);
-                
-                if (hit.collider == null)
-                {
-                    _destinationSetter.target = _playerTransform;
-                }
-                else
-                {
-                    _destinationSetter.target = null;
-                }
+                _memoryTimer = memoryTime;
+                _setter.target = _player;
             }
             else
             {
-                _destinationSetter.target = null;
+                _memoryTimer -= Time.deltaTime;
+                if (_memoryTimer <= 0) _setter.target = null;
             }
+
+            UpdateVisuals();
         }
 
-        private void UpdateAnimationAndSprite()
+        void UpdateVisuals()
         {
             if (_aiPath == null) return;
 
-            // Update Animator 'IsWalking' parameter
             if (_animator != null)
             {
-                bool isWalking = _aiPath.velocity.sqrMagnitude > 0.01f;
-                _animator.SetBool("IsWalking", isWalking);
+                _animator.SetBool("IsWalking", _aiPath.velocity.sqrMagnitude > 0.01f);
+            }
+
+            // Smoothly rotate the transform towards the movement direction, plus the offset.
+            if (_aiPath.velocity.sqrMagnitude > 0.1f)
+            {
+                float targetAngle = Mathf.Atan2(_aiPath.velocity.y, _aiPath.velocity.x) * Mathf.Rad2Deg;
+                float currentAngle = transform.eulerAngles.z;
+                float nextAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle + rotationOffset, _aiPath.rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Euler(0, 0, nextAngle);
             }
         }
 
@@ -117,17 +106,16 @@ namespace Project.Scripts
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, chaseRange);
-
-            if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
-            if (_spriteRenderer == null) return;
-
-            Vector3 forward = _spriteRenderer.flipX ? Vector3.left : Vector3.right;
-            Vector3 leftBoundary = Quaternion.Euler(0, 0, fovAngle * 0.5f) * forward;
-            Vector3 rightBoundary = Quaternion.Euler(0, 0, -fovAngle * 0.5f) * forward;
-
+            
+            // Draw FOV lines
+            float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
+            Vector3 forward = new Vector3(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle), 0);
+            Vector3 leftRay = Quaternion.Euler(0, 0, fovAngle * 0.5f) * forward;
+            Vector3 rightRay = Quaternion.Euler(0, 0, -fovAngle * 0.5f) * forward;
+            
             Gizmos.color = Color.blue;
-            Gizmos.DrawRay(transform.position, leftBoundary * chaseRange);
-            Gizmos.DrawRay(transform.position, rightBoundary * chaseRange);
+            Gizmos.DrawRay(transform.position, leftRay * chaseRange);
+            Gizmos.DrawRay(transform.position, rightRay * chaseRange);
         }
     }
 }

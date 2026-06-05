@@ -55,10 +55,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Kick()
+    public void Kick()
     {
         Debug.Log("Player Kicked!");
-        if (animator != null)
+if (animator != null)
         {
             animator.SetTrigger(PlayerKickHash);
         }

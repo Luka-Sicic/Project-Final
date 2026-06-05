@@ -12,9 +12,10 @@ public class Door : MonoBehaviour, IInteractable
     private JointAngleLimits2D closedLimits;
     private JointAngleLimits2D openLimits;
     private float lethalTimer = 0f;
+    private bool _hasBeenOpened = false;
 
     void Start()
-    {
+{
         rb = GetComponent<Rigidbody2D>();
         hinge = GetComponent<HingeJoint2D>();
         
@@ -38,7 +39,9 @@ public class Door : MonoBehaviour, IInteractable
     }
 
     public void Interact()
-{
+    {
+        if (_hasBeenOpened) return;
+
         if (isLocked)
         {
             UnlockDoor();
@@ -48,6 +51,7 @@ public class Door : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
+        if (_hasBeenOpened) return "";
         return isLocked ? "Unlock Door" : "";
     }
 
@@ -63,6 +67,7 @@ public class Door : MonoBehaviour, IInteractable
     public void UnlockDoor()
     {
         isLocked = false;
+        _hasBeenOpened = true;
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
@@ -72,11 +77,12 @@ public class Door : MonoBehaviour, IInteractable
     public void Kick(Vector2 direction)
     {
         if (isLocked) UnlockDoor();
+        _hasBeenOpened = true;
         
         if (rb != null)
         {
             rb.AddForceAtPosition(direction * kickForce, transform.position + (Vector3)direction * 0.5f, ForceMode2D.Impulse);
-            lethalTimer = 0.5f; // Door is lethal for 0.5 seconds after being kicked
+            lethalTimer = 1.0f; // Door is lethal for 1.0 seconds after being kicked
         }
     }
 
@@ -85,7 +91,7 @@ public class Door : MonoBehaviour, IInteractable
         if (lethalTimer > 0)
         {
             // Check if we hit an enemy
-            Project.Scripts.Health health = collision.gameObject.GetComponent<Project.Scripts.Health>();
+            Project.Scripts.Health health = collision.gameObject.GetComponentInParent<Project.Scripts.Health>();
             if (health != null)
             {
                 // Kill them

@@ -176,7 +176,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   kickRange: 0.8
   kickDamage: 0
-  kickForce: 5
+  kickForce: 15
   kickLayers:
     serializedVersion: 2
     m_Bits: 1025

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Scripts;
 
 public class PlayerController : MonoBehaviour
 {
@@ -7,11 +8,18 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;
     public Animator animator;
 
+    [Header("Kick Settings")]
+    public float kickRange = 1.2f;
+    public int kickDamage = 1;
+    public float kickForce = 10f;
+    public LayerMask kickLayers;
+
     Vector2 moveDirection;
     Vector2 mousePosition;
 
     // Animator parameter hash
     private static readonly int IsWalkingHash = Animator.StringToHash("IsWalking");
+    private static readonly int PlayerKickHash = Animator.StringToHash("playerkick");
 
     void Start()
     {
@@ -32,6 +40,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && weapon != null)
             weapon.Fire();
 
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Kick();
+        }
+
         // 2. Sample Mouse Position
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -39,6 +52,33 @@ public class PlayerController : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool(IsWalkingHash, moveDirection.magnitude > 0);
+        }
+    }
+
+    void Kick()
+    {
+        Debug.Log("Player Kicked!");
+        if (animator != null)
+        {
+            animator.SetTrigger(PlayerKickHash);
+        }
+
+        // The origin of the circle should be the player's position + (lookDirection * rangeOffset).
+        // Using transform.right as lookDirection and 0.5f as a reasonable rangeOffset.
+        Vector2 kickOrigin = (Vector2)transform.position + (Vector2)transform.right * 0.5f;
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(kickOrigin, kickRange, kickLayers);
+
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.TryGetComponent<Door>(out Door door))
+            {
+                door.Kick(transform.right);
+            }
+
+            if (hitCollider.TryGetComponent<Health>(out Health health))
+            {
+                health.TakeDamage(kickDamage);
+            }
         }
     }
 

@@ -174,6 +174,12 @@ MonoBehaviour:
   weapon: {fileID: 0}
   rb: {fileID: 5860062040736380976}
   animator: {fileID: 0}
+  kickRange: 1.2
+  kickDamage: 1
+  kickForce: 10
+  kickLayers:
+    serializedVersion: 2
+    m_Bits: 1025
 --- !u!95 &5092540137192561624
 Animator:
   serializedVersion: 7

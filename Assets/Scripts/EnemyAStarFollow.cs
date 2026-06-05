@@ -41,7 +41,6 @@ namespace Project.Scripts
                 _aiPath.enableRotation = false;
             }
 
-            transform.rotation = Quaternion.identity;
         }
 
         void Update()

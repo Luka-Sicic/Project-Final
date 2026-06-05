@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
 
     [Header("Kick Settings")]
-    public float kickRange = 1.2f;
-    public int kickDamage = 1;
-    public float kickForce = 10f;
+    public float kickRange = 0.8f;
+    public int kickDamage = 0; // Direct kick is now non-lethal
+    public float kickForce = 5f;
     public LayerMask kickLayers;
 
     Vector2 moveDirection;
@@ -75,7 +75,21 @@ public class PlayerController : MonoBehaviour
                 door.Kick(transform.right);
             }
 
-            if (hitCollider.TryGetComponent<Health>(out Health health))
+            if (hitCollider.TryGetComponent<EnemyAStarFollow>(out EnemyAStarFollow enemy))
+            {
+                enemy.Stun(1f);
+                
+                // Push back logic
+                Rigidbody2D enemyRb = hitCollider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    enemyRb.AddForce(transform.right * kickForce, ForceMode2D.Impulse);
+                }
+            }
+
+            // Optional: Still allow dealing damage if kickDamage > 0, 
+            // but the prompt says "only kill enemies when the player kicks a door"
+            if (kickDamage > 0 && hitCollider.TryGetComponent<Health>(out Health health))
             {
                 health.TakeDamage(kickDamage);
             }

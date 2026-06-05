@@ -26,6 +26,7 @@ namespace Project.Scripts
         private SpriteRenderer _sprite;
         private Animator _animator;
         private float _memoryTimer;
+        private float _stunTimer;
 
         void Start()
         {
@@ -45,6 +46,16 @@ namespace Project.Scripts
 
         void Update()
         {
+            if (_stunTimer > 0)
+            {
+                _stunTimer -= Time.deltaTime;
+                if (_aiPath != null) _aiPath.canMove = false;
+                UpdateVisuals();
+                return;
+            }
+
+            if (_aiPath != null) _aiPath.canMove = true;
+
             if (_player == null || _setter == null) return;
 
             float dist = Vector2.Distance(transform.position, _player.position);
@@ -115,6 +126,12 @@ namespace Project.Scripts
             Gizmos.color = Color.blue;
             Gizmos.DrawRay(transform.position, leftRay * chaseRange);
             Gizmos.DrawRay(transform.position, rightRay * chaseRange);
+        }
+
+        public void Stun(float duration)
+        {
+            _stunTimer = duration;
+            if (_aiPath != null) _aiPath.canMove = false;
         }
     }
 }

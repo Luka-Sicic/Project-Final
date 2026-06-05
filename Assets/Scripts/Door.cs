@@ -11,6 +11,7 @@ public class Door : MonoBehaviour, IInteractable
     private HingeJoint2D hinge;
     private JointAngleLimits2D closedLimits;
     private JointAngleLimits2D openLimits;
+    private float lethalTimer = 0f;
 
     void Start()
     {
@@ -28,8 +29,16 @@ public class Door : MonoBehaviour, IInteractable
         }
     }
 
-    public void Interact()
+    void Update()
     {
+        if (lethalTimer > 0)
+        {
+            lethalTimer -= Time.deltaTime;
+        }
+    }
+
+    public void Interact()
+{
         if (isLocked)
         {
             UnlockDoor();
@@ -67,6 +76,22 @@ public class Door : MonoBehaviour, IInteractable
         if (rb != null)
         {
             rb.AddForceAtPosition(direction * kickForce, transform.position + (Vector3)direction * 0.5f, ForceMode2D.Impulse);
+            lethalTimer = 0.5f; // Door is lethal for 0.5 seconds after being kicked
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (lethalTimer > 0)
+        {
+            // Check if we hit an enemy
+            Project.Scripts.Health health = collision.gameObject.GetComponent<Project.Scripts.Health>();
+            if (health != null)
+            {
+                // Kill them
+                health.TakeDamage(999);
+                Debug.Log("Enemy smashed by door!");
+            }
         }
     }
 }

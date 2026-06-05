@@ -15,6 +15,8 @@ public class WeaponPickup : MonoBehaviour
 
     private PlayerController player;
     private static WeaponPickup currentInteractable;
+    private static float nextPickupTime = 0f;
+    private const float GlobalPickupCooldown = 0.2f;
 
     void Start()
     {
@@ -58,8 +60,9 @@ public class WeaponPickup : MonoBehaviour
             if (canvasPrompt != null && !canvasPrompt.activeSelf) 
                 canvasPrompt.SetActive(true);
             
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextPickupTime)
             {
+                nextPickupTime = Time.time + GlobalPickupCooldown;
                 PickUp();
             }
         }

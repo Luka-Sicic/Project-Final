@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Scripts;
 
 public class Bullet : MonoBehaviour
 {
@@ -8,6 +9,11 @@ public class Bullet : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             return;
+        }
+
+        if (collision.gameObject.TryGetComponent(out Health health))
+        {
+            health.TakeDamage(1);
         }
 
         Destroy(gameObject);

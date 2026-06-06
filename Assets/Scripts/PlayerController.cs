@@ -75,12 +75,22 @@ if (animator != null)
                 door.Kick(transform.right);
             }
 
-            if (hitCollider.TryGetComponent<EnemyAStarFollow>(out EnemyAStarFollow enemy))
+            if (hitCollider.CompareTag("Enemy"))
             {
-                enemy.Stun(1f);
-                
+                // Try to stun the enemy if it has a compatible script
+                if (hitCollider.TryGetComponent<EnemyAStarFollow>(out var aStarEnemy))
+                {
+                    aStarEnemy.Stun(1f);
+                }
+                else if (hitCollider.TryGetComponent<EnemyShotgunAI>(out var shotgunEnemy))
+                {
+                    shotgunEnemy.Stun(1f);
+                }
+
                 // Push back logic
                 Rigidbody2D enemyRb = hitCollider.GetComponent<Rigidbody2D>();
+                if (enemyRb == null) enemyRb = hitCollider.GetComponentInParent<Rigidbody2D>();
+
                 if (enemyRb != null)
                 {
                     enemyRb.AddForce(transform.right * kickForce, ForceMode2D.Impulse);

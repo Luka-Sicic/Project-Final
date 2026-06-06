@@ -44,6 +44,12 @@ namespace Project.Scripts
         private bool _isWaitingAtLastSeen;
         private float _searchTimer;
 
+        public void Stun(float duration)
+        {
+            _moveResumeTimer = duration;
+            if (_aiPath != null) _aiPath.canMove = false;
+        }
+
         void Start()
         {
             _player = GameObject.FindGameObjectWithTag("Player")?.transform;

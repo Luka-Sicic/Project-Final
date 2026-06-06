@@ -94,19 +94,17 @@ public class WeaponPickup : MonoBehaviour
         // Handle Animations
         if (player.animator != null)
         {
+            // Reset common weapon bools to ensure only the new one is active
+            player.animator.SetBool("HasShotgun", false);
+            player.animator.SetBool("HasPistol", false);
+            player.animator.SetBool("HasBat", false);
+
             if (!string.IsNullOrEmpty(animTrigger))
                 player.animator.SetTrigger(animTrigger);
             
             if (!string.IsNullOrEmpty(animBool))
             {
-                foreach (var param in player.animator.parameters)
-                {
-                    if (param.name == animBool)
-                    {
-                        player.animator.SetBool(animBool, true);
-                        break;
-                    }
-                }
+                player.animator.SetBool(animBool, true);
             }
         }
 

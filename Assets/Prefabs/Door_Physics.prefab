@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
   isLocked: 0
-  kickForce: 1
+  kickForce: 500
 --- !u!1 &8282918827857336597
 GameObject:
   m_ObjectHideFlags: 0

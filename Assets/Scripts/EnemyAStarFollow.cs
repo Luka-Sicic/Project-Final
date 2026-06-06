@@ -12,21 +12,27 @@ namespace Project.Scripts
         public float fovAngle = 180f;
         public LayerMask obstacleLayer;
         
-        [Header("Memory")]
-        [Tooltip("Seconds to keep chasing after losing line of sight.")]
-        public float memoryTime = 1.5f;
-
         [Header("Visuals")]
         [Tooltip("Offset added to rotation. If the sprite points its 'side' at the player, adjust this (usually 90 or -90).")]
         public float rotationOffset = -90f;
+
+        [Header("Patrol")]
+        public Transform[] patrolPoints;
+        public float patrolWaitTime = 1f;
 
         private Transform _player;
         private AIDestinationSetter _setter;
         private AIPath _aiPath;
         private SpriteRenderer _sprite;
         private Animator _animator;
-        private float _memoryTimer;
         private float _stunTimer;
+        private int _currentPatrolIndex;
+        private float _patrolWaitTimer;
+
+        private Vector3 _lastSeenPosition;
+        private bool _isSearching;
+        private bool _isWaitingAtLastSeen;
+        private float _searchTimer;
 
         void Start()
         {
@@ -54,12 +60,10 @@ namespace Project.Scripts
                 return;
             }
 
-            if (_aiPath != null) _aiPath.canMove = true;
+            if (_aiPath != null) _aiPath.canMove = !_isWaitingAtLastSeen;
 
-            if (_player == null || _setter == null) return;
-
-            float dist = Vector2.Distance(transform.position, _player.position);
-            bool canSee = dist <= chaseRange;
+            float dist = _player != null ? Vector2.Distance(transform.position, _player.position) : float.MaxValue;
+            bool canSee = _player != null && dist <= chaseRange;
 
             if (canSee)
             {
@@ -81,16 +85,63 @@ namespace Project.Scripts
 
             if (canSee)
             {
-                _memoryTimer = memoryTime;
-                _setter.target = _player;
+                _lastSeenPosition = _player.position;
+                _isSearching = false;
+                _isWaitingAtLastSeen = false;
+                if (_setter != null) _setter.target = _player;
+                _patrolWaitTimer = 0f;
             }
             else
             {
-                _memoryTimer -= Time.deltaTime;
-                if (_memoryTimer <= 0) _setter.target = null;
+                if (_setter != null && _setter.target != null)
+                {
+                    // Transition from chasing to searching
+                    _setter.target = null;
+                    _aiPath.destination = _lastSeenPosition;
+                    _isSearching = true;
+                }
+
+                if (_isSearching)
+                {
+                    if (_aiPath.reachedDestination && !_aiPath.pathPending)
+                    {
+                        _isSearching = false;
+                        _isWaitingAtLastSeen = true;
+                        _searchTimer = 3f;
+                    }
+                }
+                else if (_isWaitingAtLastSeen)
+                {
+                    _searchTimer -= Time.deltaTime;
+                    if (_searchTimer <= 0)
+                    {
+                        _isWaitingAtLastSeen = false;
+                    }
+                }
+                else
+                {
+                    UpdatePatrol();
+                }
             }
 
             UpdateVisuals();
+}
+
+        private void UpdatePatrol()
+        {
+            if (patrolPoints == null || patrolPoints.Length == 0) return;
+
+            _aiPath.destination = patrolPoints[_currentPatrolIndex].position;
+
+            if (_aiPath.reachedDestination && !_aiPath.pathPending)
+            {
+                _patrolWaitTimer += Time.deltaTime;
+                if (_patrolWaitTimer >= patrolWaitTime)
+                {
+                    _patrolWaitTimer = 0f;
+                    _currentPatrolIndex = (_currentPatrolIndex + 1) % patrolPoints.Length;
+                }
+            }
         }
 
         void UpdateVisuals()

@@ -7,6 +7,7 @@ public abstract class Weapon : MonoBehaviour
     public int maxAmmo;
     public int spareReloads;
     public float reloadDuration = 2f;
+    public float noiseRadius = 15f;
     public bool IsReloading { get; protected set; }
 
     public abstract void Fire();

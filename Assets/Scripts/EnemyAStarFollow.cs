@@ -5,8 +5,8 @@ namespace Project.Scripts
 {
     [RequireComponent(typeof(AIPath))]
     [RequireComponent(typeof(AIDestinationSetter))]
-    public class EnemyAStarFollow : MonoBehaviour
-    {
+    public class EnemyAStarFollow : MonoBehaviour, INoiseListener
+{
         [Header("Detection")]
         public float chaseRange = 5f;
         public float fovAngle = 180f;
@@ -33,6 +33,21 @@ namespace Project.Scripts
         private bool _isSearching;
         private bool _isWaitingAtLastSeen;
         private float _searchTimer;
+
+        public void OnHearNoise(Vector2 sourcePosition)
+        {
+            if (_setter != null && _setter.target == null)
+            {
+                _lastSeenPosition = sourcePosition;
+                _isSearching = true;
+                _isWaitingAtLastSeen = false;
+                if (_aiPath != null)
+                {
+                    _aiPath.destination = sourcePosition;
+                    _aiPath.canMove = true;
+                }
+            }
+        }
 
         void Start()
         {
@@ -77,11 +92,11 @@ namespace Project.Scripts
                 {
                     canSee = false;
                 }
-                else if (Physics2D.Raycast(transform.position, dirToPlayer, dist, obstacleLayer))
+                else if (!HasLineOfSight(dirToPlayer, dist))
                 {
                     canSee = false;
                 }
-            }
+}
 
             if (canSee)
             {
@@ -131,15 +146,22 @@ namespace Project.Scripts
         {
             if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-            _aiPath.destination = patrolPoints[_currentPatrolIndex].position;
+            // Ensure index is valid
+            if (_currentPatrolIndex < 0 || _currentPatrolIndex >= patrolPoints.Length) _currentPatrolIndex = 0;
+            if (patrolPoints[_currentPatrolIndex] == null) return;
 
-            if (_aiPath.reachedDestination && !_aiPath.pathPending)
+            if (_aiPath != null)
             {
-                _patrolWaitTimer += Time.deltaTime;
-                if (_patrolWaitTimer >= patrolWaitTime)
+                _aiPath.destination = patrolPoints[_currentPatrolIndex].position;
+
+                if (_aiPath.reachedDestination && !_aiPath.pathPending)
                 {
-                    _patrolWaitTimer = 0f;
-                    _currentPatrolIndex = (_currentPatrolIndex + 1) % patrolPoints.Length;
+                    _patrolWaitTimer += Time.deltaTime;
+                    if (_patrolWaitTimer >= patrolWaitTime)
+                    {
+                        _patrolWaitTimer = 0f;
+                        _currentPatrolIndex = (_currentPatrolIndex + 1) % patrolPoints.Length;
+                    }
                 }
             }
         }
@@ -183,6 +205,29 @@ namespace Project.Scripts
         {
             _stunTimer = duration;
             if (_aiPath != null) _aiPath.canMove = false;
+        }
+
+        private bool HasLineOfSight(Vector2 dirToPlayer, float dist)
+        {
+            // Use RaycastAll to check for both obstacles and locked doors
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dirToPlayer, dist);
+            
+            // Sort hits by distance
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (var hit in hits)
+            {
+                if (hit.collider.gameObject == gameObject) continue;
+                if (hit.collider.CompareTag("Player")) return true;
+
+                // Check if it's a wall/obstacle
+                if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0) return false;
+
+                // Check if it's a locked door
+                if (hit.collider.TryGetComponent<Door>(out var door) && door.isLocked) return false;
+            }
+
+            return false;
         }
     }
 }

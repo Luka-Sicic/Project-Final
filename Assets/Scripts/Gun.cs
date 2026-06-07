@@ -17,8 +17,10 @@ public class Gun : Weapon
         if (ammo <= 0) return;
         ammo--;
 
+        NoiseManager.MakeNoise(transform.position, noiseRadius);
+
         GameObject bullet = Instantiate(
-            Bullet,
+Bullet,
             firePoint.position,
             firePoint.rotation
         );

@@ -5,22 +5,22 @@ namespace Project.Scripts
 {
     [RequireComponent(typeof(AIPath))]
     [RequireComponent(typeof(AIDestinationSetter))]
-    public class EnemyShotgunAI : MonoBehaviour, INoiseListener
-{
+    public class EnemyMeleeAI : MonoBehaviour, INoiseListener
+    {
         [Header("Detection & Movement")]
         public float chaseRange = 10f;
-        public float shootRange = 7f;
-        public float fovAngle = 180f;
+        public float attackRange = 1.5f;
+        public float fovAngle = 360f; // Bats can see all around?
         public LayerMask obstacleLayer;
         public float rotationOffset = -90f;
 
-        [Header("Shooting")]
-        public GameObject bulletPrefab;
-        public Transform firePoint;
-        public float fireRate = 1.5f;
-        public int pelletCount = 5;
-        public float spreadAngle = 20f;
-        public float bulletSpeed = 15f;
+        [Header("Attacking")]
+        public float attackRate = 1.5f;
+        public int damage = 1;
+        public float attackRadius = 1f;
+        public Transform attackPoint;
+        public LayerMask targetLayers;
+        public string attackTrigger = "Attack";
 
         [Header("Visuals")]
         public Sprite staticSprite;
@@ -32,7 +32,7 @@ namespace Project.Scripts
         private Transform _player;
         private AIDestinationSetter _setter;
         private AIPath _aiPath;
-        private float _fireTimer;
+        private float _attackTimer;
 
         private Animator _animator;
         private SpriteRenderer _spriteRenderer;
@@ -73,11 +73,6 @@ namespace Project.Scripts
             _animator = GetComponent<Animator>();
             _spriteRenderer = GetComponent<SpriteRenderer>();
 
-            if (_animator != null)
-            {
-                _animator.enabled = false;
-            }
-
             if (_spriteRenderer != null && staticSprite != null)
             {
                 _spriteRenderer.sprite = staticSprite;
@@ -88,9 +83,9 @@ namespace Project.Scripts
                 _aiPath.enableRotation = false;
             }
 
-            if (firePoint == null)
+            if (attackPoint == null)
             {
-                firePoint = transform;
+                attackPoint = transform;
             }
         }
 
@@ -98,7 +93,7 @@ namespace Project.Scripts
         {
             // Update timers
             if (_moveResumeTimer > 0) _moveResumeTimer -= Time.deltaTime;
-            if (_fireTimer > 0) _fireTimer -= Time.deltaTime;
+            if (_attackTimer > 0) _attackTimer -= Time.deltaTime;
 
             float dist = _player != null ? Vector2.Distance(transform.position, _player.position) : float.MaxValue;
             bool canSee = _player != null && HasLineOfSight() && dist <= chaseRange;
@@ -112,20 +107,20 @@ namespace Project.Scripts
                 if (_setter != null) _setter.target = _player;
                 _patrolWaitTimer = 0f;
 
-                if (dist <= shootRange)
+                if (dist <= attackRange)
                 {
-                    // Inside shooting range: stop and attack
+                    // Inside attack range: stop and attack
                     if (_aiPath != null) _aiPath.canMove = false;
 
-                    if (_fireTimer <= 0)
+                    if (_attackTimer <= 0)
                     {
-                        Shoot();
-                        _fireTimer = fireRate;
+                        Attack();
+                        _attackTimer = attackRate;
                     }
                 }
                 else
                 {
-                    // Outside shooting range but inside chase range: resume movement if recoil over
+                    // Outside attack range but inside chase range: resume movement
                     if (_moveResumeTimer <= 0 && _aiPath != null)
                     {
                         _aiPath.canMove = true;
@@ -176,6 +171,7 @@ namespace Project.Scripts
                 }
             }
 
+            UpdateVisuals();
             UpdateRotation();
         }
 
@@ -183,7 +179,6 @@ namespace Project.Scripts
         {
             if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-            // Ensure index is valid
             if (_currentPatrolIndex < 0 || _currentPatrolIndex >= patrolPoints.Length) _currentPatrolIndex = 0;
             if (patrolPoints[_currentPatrolIndex] == null) return;
 
@@ -209,11 +204,14 @@ namespace Project.Scripts
             float dist = Vector2.Distance(transform.position, _player.position);
 
             // FOV check
-            float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
-            Vector2 forward = new Vector2(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle));
-            if (Vector2.Angle(forward, dirToPlayer) > fovAngle * 0.5f) return false;
+            if (fovAngle < 360f)
+            {
+                float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
+                Vector2 forward = new Vector2(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle));
+                if (Vector2.Angle(forward, dirToPlayer) > fovAngle * 0.5f) return false;
+            }
 
-            // Obstacle & Locked Door check
+            // Obstacle check
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dirToPlayer, dist);
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
@@ -221,47 +219,44 @@ namespace Project.Scripts
             {
                 if (hit.collider.gameObject == gameObject) continue;
                 if (hit.collider.CompareTag("Player")) return true;
-
-                // Check if it's a wall/obstacle
                 if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0) return false;
-
-                // Check if it's a locked door
                 if (hit.collider.TryGetComponent<Door>(out var door) && door.isLocked) return false;
             }
 
             return false;
         }
 
-        void Shoot()
+        void Attack()
         {
-            if (bulletPrefab == null) return;
+            if (_animator != null)
+            {
+                _animator.SetTrigger(attackTrigger);
+            }
 
-            // Stop movement when firing
+            // Stop movement when attacking
             if (_aiPath != null)
             {
                 _aiPath.canMove = false;
-                _moveResumeTimer = 0.5f;
+                _moveResumeTimer = 0.5f; 
             }
 
-            float startAngle = -spreadAngle * 0.5f;
-            float angleStep = pelletCount > 1 ? spreadAngle / (pelletCount - 1) : 0;
-
-            for (int i = 0; i < pelletCount; i++)
+            // Damage logic
+            Vector3 point = attackPoint != null ? attackPoint.position : transform.position;
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(point, attackRadius, targetLayers);
+            
+            foreach (var hit in hitColliders)
             {
-                float currentAngle = startAngle + (angleStep * i);
-                // Rotate firePoint.right by currentAngle
-                Quaternion rotation = transform.rotation * Quaternion.Euler(0, 0, currentAngle - rotationOffset);
-                
-                GameObject bullet = Instantiate(bulletPrefab, firePoint.position, rotation);
-                Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-                if (rb != null)
+                if (hit.TryGetComponent<Health>(out var health))
                 {
-                    // In 2D, transform.right is often the forward direction.
-                    // But we used rotationOffset. 
-                    // Let's use the rotation we just calculated.
-                    rb.linearVelocity = (Vector2)(rotation * Vector3.right) * bulletSpeed;
+                    health.TakeDamage(damage);
                 }
             }
+        }
+
+        void UpdateVisuals()
+        {
+            if (_aiPath == null || _animator == null) return;
+            _animator.SetBool("IsWalking", _aiPath.velocity.sqrMagnitude > 0.01f);
         }
 
         void UpdateRotation()
@@ -271,12 +266,10 @@ namespace Project.Scripts
             Vector2 direction = Vector2.zero;
             if (_setter.target != null)
             {
-                // Rotate towards player if we are chasing
                 direction = (_player.position - transform.position).normalized;
             }
             else if (_aiPath.velocity.sqrMagnitude > 0.1f)
             {
-                // Rotate towards movement direction if not chasing but moving
                 direction = _aiPath.velocity.normalized;
             }
 
@@ -287,6 +280,16 @@ namespace Project.Scripts
                 float nextAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle + rotationOffset, _aiPath.rotationSpeed * Time.deltaTime);
                 transform.rotation = Quaternion.Euler(0, 0, nextAngle);
             }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Vector3 point = attackPoint != null ? attackPoint.position : transform.position;
+            Gizmos.DrawWireSphere(point, attackRadius);
+            
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, chaseRange);
         }
     }
 }

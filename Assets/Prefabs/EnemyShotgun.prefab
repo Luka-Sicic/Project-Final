@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 5373993192525163428}
   - component: {fileID: 5308659293665091619}
   - component: {fileID: 2347955990378208117}
+  - component: {fileID: 3900599891818149030}
+  - component: {fileID: 7274326964731254565}
   m_Layer: 10
   m_Name: EnemyShotgun
   m_TagString: Enemy
@@ -257,7 +259,7 @@ MonoBehaviour:
     visualizeSensitivity: 0
   targetCompatibility: {fileID: 0}
   maxAcceleration: -2.5
-  rotationSpeed: 360
+  rotationSpeed: 720
   slowdownDistance: 1
   pickNextWaypointDist: 0.5
   endReachedDistance: 0.5
@@ -322,6 +324,32 @@ MonoBehaviour:
   staticSprite: {fileID: -7016851391815386805, guid: c7bc6eb71f14d0a409b246482e0feede, type: 3}
   patrolPoints: []
   patrolWaitTime: 1
+--- !u!114 &3900599891818149030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957117846541321972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d415dfc5af55524cb21bbee19c61689, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyDoorUnlocker
+--- !u!114 &7274326964731254565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957117846541321972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02d0e61f457f05b41a3e9e95e0e7ba6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyContactDamage
+  damage: 1
+  damageInterval: 1
 --- !u!1 &3032873663708494110
 GameObject:
   m_ObjectHideFlags: 0

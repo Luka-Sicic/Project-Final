@@ -215,5 +215,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb077bb38b3c904c8265c0ed02284c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.Health
-  maxHealth: 1
+  maxHealth: 3
   deathSprite: {fileID: -5294794738722519606, guid: 558103e8d297f6243858817c6f981a90, type: 3}
+  dropPrefab: {fileID: 0}

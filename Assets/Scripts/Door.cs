@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Door : MonoBehaviour, IInteractable
@@ -76,37 +77,99 @@ public class Door : MonoBehaviour, IInteractable
 
     public void Kick(Vector2 kickerPosition)
     {
+        if (_hasBeenOpened) return;
+        
+        lethalTimer = 1.0f; // Door is lethal for 1.0 seconds after being kicked
         if (isLocked) UnlockDoor();
         _hasBeenOpened = true;
         
         if (rb != null)
         {
+            // Ensure the rigidbody is awake and dynamic
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.WakeUp();
+            
             // Calculate direction from kicker to door center
             Vector2 doorCenter = rb.worldCenterOfMass;
             Vector2 direction = (doorCenter - kickerPosition).normalized;
             
             // Apply force at the center of mass in the direction away from the kicker.
-            // Since the door is hinged, this will produce torque that swings the door away.
+            // Using Impulse for immediate movement.
             rb.AddForceAtPosition(direction * kickForce, doorCenter, ForceMode2D.Impulse);
-            lethalTimer = 1.0f; // Door is lethal for 1.0 seconds after being kicked
+            
+            // Log for debugging
+            Debug.Log("[Door] Kicked door: " + name + " with force " + kickForce);
+
+            // NEW: Immediate check for enemies already overlapping/touching the door.
+            // This is critical for locked doors that were static and didn't have active physics contacts.
+            CheckImmediateCollisions();
+        }
+    }
+
+    private void CheckImmediateCollisions()
+    {
+        Collider2D[] myColliders = GetComponents<Collider2D>();
+        ContactFilter2D filter = new ContactFilter2D().NoFilter();
+        filter.useTriggers = false;
+        
+        List<Collider2D> results = new List<Collider2D>();
+        foreach (var col in myColliders)
+        {
+            int count = col.Overlap(filter, results);
+            for (int i = 0; i < count; i++)
+            {
+                if (results[i].gameObject != gameObject)
+                {
+                    HandleLethalCollision(results[i].gameObject);
+                }
+            }
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        // If lethal timer is active, treat stay as an enter to catch already-touching enemies
+        if (lethalTimer > 0)
+        {
+            HandleLethalCollision(collision.gameObject);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (lethalTimer <= 0) return;
+        if (lethalTimer > 0)
+        {
+            HandleLethalCollision(collision.gameObject);
+        }
+    }
+
+    private void HandleLethalCollision(GameObject other)
+    {
+        Debug.Log("[Door] Collision while lethal with: " + other.name + " (Layer: " + LayerMask.LayerToName(other.layer) + ")");
 
         // Don't kill other doors
-        if (collision.gameObject.GetComponentInParent<Door>() != null) return;
+        if (other.GetComponentInParent<Door>() != null) 
+        {
+            Debug.Log("[Door] Ignored (Door)");
+            return;
+        }
 
         // Don't kill the player
-        if (collision.gameObject.CompareTag("Player") || collision.gameObject.GetComponentInParent<PlayerController>() != null) return;
+        if (other.CompareTag("Player") || other.GetComponentInParent<PlayerController>() != null) 
+        {
+            Debug.Log("[Door] Ignored (Player)");
+            return;
+        }
 
-        Project.Scripts.Health health = collision.gameObject.GetComponentInParent<Project.Scripts.Health>();
+        Project.Scripts.Health health = other.GetComponentInParent<Project.Scripts.Health>();
         if (health != null)
         {
             health.TakeDamage(999);
-            Debug.Log("Enemy smashed by door!");
+            Debug.Log("[Door] Enemy smashed by door: " + other.name);
+        }
+        else
+        {
+            Debug.Log("[Door] No Health component found on: " + other.name);
         }
     }
 }

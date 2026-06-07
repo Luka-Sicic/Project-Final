@@ -16,12 +16,12 @@ GameObject:
   - component: {fileID: 3078848188502202221}
   - component: {fileID: 7084853748653347819}
   - component: {fileID: 464410178599942404}
-  - component: {fileID: 4360172333553316178}
   - component: {fileID: 4229841104188214643}
   - component: {fileID: -5828726092008307832}
-  - component: {fileID: 7424510380678068008}
+  - component: {fileID: 7613961332693581152}
+  - component: {fileID: 5468752625348536774}
   m_Layer: 10
-  m_Name: Enemy
+  m_Name: EnemyBat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -91,7 +91,7 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -606981714141246437, guid: 2e545274b56ffe643bda53f5dfa4cf1e, type: 3}
+  m_Sprite: {fileID: 1717480345832749148, guid: 282f18bc6a2200745b76fd611361f938, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -111,7 +111,7 @@ Animator:
   m_GameObject: {fileID: 6735760204460061288}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 714bc00942d11584bb3e5200b15fd932, type: 2}
+  m_Controller: {fileID: 9100000, guid: 46004875f235f4e46b202db2a5d52ab4, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -184,17 +184,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.35}
+  m_Offset: {x: 0, y: 0.019990698}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: -0.014705883}
-    oldSize: {x: 0.38, y: 0.68}
+    pivot: {x: -0.23913044, y: 0.46226412}
+    oldSize: {x: 0.46, y: 1.06}
     newSize: {x: 0.38, y: 0.68}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.38, y: 0.68}
+  m_Size: {x: 0.38, y: 0.7068299}
   m_EdgeRadius: 0
 --- !u!114 &3078848188502202221
 MonoBehaviour:
@@ -280,26 +280,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: AstarPathfindingProject::Pathfinding.AIDestinationSetter
   version: 1
   target: {fileID: 0}
---- !u!114 &4360172333553316178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6735760204460061288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9628b8ed219cad4a9b0a19813cbfc04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyAStarFollow
-  chaseRange: 4
-  fovAngle: 180
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  rotationOffset: 0
-  patrolPoints: []
-  patrolWaitTime: 1
 --- !u!114 &4229841104188214643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,7 +307,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d415dfc5af55524cb21bbee19c61689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyDoorUnlocker
---- !u!114 &7424510380678068008
+--- !u!114 &7613961332693581152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6735760204460061288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78752de7612e31143a594a01b723fb97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyMeleeAI
+  chaseRange: 10
+  attackRange: 1.5
+  fovAngle: 360
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  rotationOffset: 0
+  attackRate: 1.5
+  damage: 1
+  attackRadius: 1.8
+  attackPoint: {fileID: 0}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  attackTrigger: Attack
+  staticSprite: {fileID: 1717480345832749148, guid: 282f18bc6a2200745b76fd611361f938, type: 3}
+  patrolPoints: []
+  patrolWaitTime: 1
+--- !u!114 &5468752625348536774
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -83,8 +83,17 @@ public class WeaponPickup : MonoBehaviour
             return;
         }
 
+        // Check if player already has this weapon type
+        Weapon prefabWeapon = weaponPrefab.GetComponent<Weapon>();
+        if (player.weapon != null && player.weapon.GetType() == prefabWeapon.GetType())
+        {
+            player.weapon.spareReloads++;
+            Destroy(gameObject);
+            return;
+        }
+
         GameObject weaponInstance = Instantiate(weaponPrefab);
-        Weapon weaponScript = weaponInstance.GetComponent<Weapon>();
+Weapon weaponScript = weaponInstance.GetComponent<Weapon>();
         
         if (weaponScript != null)
         {

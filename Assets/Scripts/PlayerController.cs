@@ -37,11 +37,14 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetAxisRaw("Vertical");
         moveDirection = new Vector2(moveX, moveY).normalized;
 
-        if (Input.GetMouseButtonDown(0) && weapon != null)
+        if (Input.GetMouseButtonDown(0) && weapon != null && !weapon.IsReloading)
             weapon.Fire();
 
+        if (Input.GetKeyDown(KeyCode.R) && weapon != null)
+            weapon.Reload();
+
         if (Input.GetKeyDown(KeyCode.Q))
-        {
+{
             Kick();
         }
 
@@ -72,7 +75,7 @@ if (animator != null)
         {
             if (hitCollider.TryGetComponent<Door>(out Door door))
             {
-                door.Kick(transform.right);
+                door.Kick(transform.position);
             }
 
             if (hitCollider.CompareTag("Enemy"))

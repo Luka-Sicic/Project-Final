@@ -6,6 +6,7 @@ namespace Project.Scripts
     {
         [SerializeField] private int maxHealth = 1;
         [SerializeField] private Sprite deathSprite;
+        [SerializeField] private GameObject dropPrefab;
         
         private int _currentHealth;
 
@@ -25,6 +26,11 @@ namespace Project.Scripts
 
         private void Die()
         {
+            if (dropPrefab != null)
+            {
+                Instantiate(dropPrefab, transform.position, Quaternion.identity);
+            }
+
             // Create a new object for the corpse
             GameObject corpse = new GameObject(name + "_Corpse");
             corpse.transform.position = transform.position;

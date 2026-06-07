@@ -6,8 +6,17 @@ public class Gun : Weapon
     public Transform firePoint;
     public float bulletSpeed = 20f;
 
+    private void Start()
+    {
+        if (maxAmmo == 0) maxAmmo = 10;
+        ammo = maxAmmo;
+    }
+
     public override void Fire()
     {
+        if (ammo <= 0) return;
+        ammo--;
+
         GameObject bullet = Instantiate(
             Bullet,
             firePoint.position,

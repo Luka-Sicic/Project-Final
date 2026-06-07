@@ -6,8 +6,18 @@ public class Pistol : Weapon
     public Transform firePoint;
     public float bulletSpeed = 20f;
 
+    private void Start()
+    {
+        maxAmmo = 10;
+        ammo = maxAmmo;
+    }
+
     public override void Fire()
     {
+        if (ammo <= 0) return;
+
+        ammo--;
+
         // Fires only one bullet in the direction of the firePoint
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();

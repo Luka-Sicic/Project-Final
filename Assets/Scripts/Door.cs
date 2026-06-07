@@ -74,30 +74,39 @@ public class Door : MonoBehaviour, IInteractable
         }
     }
 
-    public void Kick(Vector2 direction)
+    public void Kick(Vector2 kickerPosition)
     {
         if (isLocked) UnlockDoor();
         _hasBeenOpened = true;
         
         if (rb != null)
         {
-            rb.AddForceAtPosition(direction * kickForce, transform.position + (Vector3)direction * 0.5f, ForceMode2D.Impulse);
+            // Calculate direction from kicker to door center
+            Vector2 doorCenter = rb.worldCenterOfMass;
+            Vector2 direction = (doorCenter - kickerPosition).normalized;
+            
+            // Apply force at the center of mass in the direction away from the kicker.
+            // Since the door is hinged, this will produce torque that swings the door away.
+            rb.AddForceAtPosition(direction * kickForce, doorCenter, ForceMode2D.Impulse);
             lethalTimer = 1.0f; // Door is lethal for 1.0 seconds after being kicked
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (lethalTimer > 0)
+        if (lethalTimer <= 0) return;
+
+        // Don't kill other doors
+        if (collision.gameObject.GetComponentInParent<Door>() != null) return;
+
+        // Don't kill the player
+        if (collision.gameObject.CompareTag("Player") || collision.gameObject.GetComponentInParent<PlayerController>() != null) return;
+
+        Project.Scripts.Health health = collision.gameObject.GetComponentInParent<Project.Scripts.Health>();
+        if (health != null)
         {
-            // Check if we hit an enemy
-            Project.Scripts.Health health = collision.gameObject.GetComponentInParent<Project.Scripts.Health>();
-            if (health != null)
-            {
-                // Kill them
-                health.TakeDamage(999);
-                Debug.Log("Enemy smashed by door!");
-            }
+            health.TakeDamage(999);
+            Debug.Log("Enemy smashed by door!");
         }
     }
 }

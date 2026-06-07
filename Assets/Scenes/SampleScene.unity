@@ -2586,11 +2586,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.6599662
+      value: 2.21
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.071208
+      value: 3.22
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2598,7 +2598,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.70977104
+      value: -0.704465
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2610,7 +2610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.7044324
+      value: -0.70973873
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2622,7 +2622,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8899316204625679280, guid: 4677e1180da7a374896fa207c1f95fde, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -89.567
+      value: -269.573
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2889,6 +2889,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8954106414809325103, guid: 00d1bcfbe0eab234dbdee496abf6584d, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8954106414809325103, guid: 00d1bcfbe0eab234dbdee496abf6584d, type: 3}
+      propertyPath: maxHealth
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 982165500848885107, guid: 00d1bcfbe0eab234dbdee496abf6584d, type: 3}
       propertyPath: kickForce
       value: 10

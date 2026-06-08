@@ -7,6 +7,9 @@ namespace Project.Scripts
         [SerializeField] private int maxHealth = 1;
         [SerializeField] private Sprite deathSprite;
         [SerializeField] private GameObject dropPrefab;
+        [SerializeField] private Sprite[] bloodSprites;
+        [SerializeField] private bool canBleed = true;
+        [SerializeField] private float bloodOffsetRange = 0.2f;
         
         private int _currentHealth;
 
@@ -17,11 +20,36 @@ namespace Project.Scripts
 
         public void TakeDamage(int amount)
         {
+            if (amount > 0 && canBleed)
+            {
+                SpawnBlood();
+            }
+
             _currentHealth -= amount;
             if (_currentHealth <= 0)
             {
                 Die();
             }
+        }
+
+        private void SpawnBlood()
+        {
+            if (bloodSprites == null || bloodSprites.Length == 0) return;
+
+            GameObject blood = new GameObject("BloodSplatter");
+            
+            Vector3 offset = new Vector3(
+                Random.Range(-bloodOffsetRange, bloodOffsetRange),
+                Random.Range(-bloodOffsetRange, bloodOffsetRange),
+                0f
+            );
+            blood.transform.position = transform.position + offset;
+            blood.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+
+            SpriteRenderer sr = blood.AddComponent<SpriteRenderer>();
+            sr.sprite = bloodSprites[Random.Range(0, bloodSprites.Length)];
+            sr.sortingLayerName = "Ground";
+            sr.sortingOrder = 1;
         }
 
         private void Die()

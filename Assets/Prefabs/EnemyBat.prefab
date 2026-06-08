@@ -295,6 +295,21 @@ MonoBehaviour:
   maxHealth: 1
   deathSprite: {fileID: -1049424526154432507, guid: 8b7b411661fa5eb459555faf9efef61b, type: 3}
   dropPrefab: {fileID: 0}
+  bloodSprites:
+  - {fileID: -8801263648035040421, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 3721750585631302050, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: -1213412184745715344, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 2316818466431690370, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: -522055091495217989, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: -2321406998696738726, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 5747412969310067156, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 6472013389920250101, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 5949762085405636577, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 7516329598919818584, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: -4019625712183056123, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  - {fileID: 4617029771734338993, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
+  canBleed: 1
+  bloodOffsetRange: 0.2
 --- !u!114 &-5828726092008307832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,7 +336,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyMeleeAI
   chaseRange: 10
   attackRange: 1.5
-  fovAngle: 360
+  fovAngle: 120
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 128

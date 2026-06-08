@@ -76,8 +76,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19e55b615158c404ba65e7751bfe67dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bat
+  ammo: 0
+  maxAmmo: 0
+  spareReloads: 0
+  reloadDuration: 2
+  noiseRadius: 15
   damage: 10
-  attackRange: 0.5
+  attackRange: 0.75
   attackPoint: {fileID: 6304485153560465665}
   enemyLayers:
     serializedVersion: 2

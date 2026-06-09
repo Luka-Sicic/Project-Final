@@ -10,7 +10,7 @@ namespace Project.Scripts
         [Header("Detection & Movement")]
         public float chaseRange = 10f;
         public float attackRange = 1.5f;
-        public float fovAngle = 360f; // Bats can see all around?
+        public float fovAngle = 360f; 
         public LayerMask obstacleLayer;
         public float rotationOffset = -90f;
 
@@ -24,6 +24,10 @@ namespace Project.Scripts
 
         [Header("Visuals")]
         public Sprite staticSprite;
+
+        [Header("Audio")]
+        public AudioSource audioSource;
+        public AudioClip swingSound, hitSound;
 
         [Header("Patrol")]
         public Transform[] patrolPoints;
@@ -91,14 +95,14 @@ namespace Project.Scripts
 
         void Update()
         {
-            // Update timers
+            
             if (_moveResumeTimer > 0) _moveResumeTimer -= Time.deltaTime;
             if (_attackTimer > 0) _attackTimer -= Time.deltaTime;
 
             float dist = _player != null ? Vector2.Distance(transform.position, _player.position) : float.MaxValue;
             bool canSee = _player != null && HasLineOfSight() && dist <= chaseRange;
 
-            // Movement and Targeting Logic
+            
             if (canSee)
             {
                 _lastSeenPosition = _player.position;
@@ -109,7 +113,7 @@ namespace Project.Scripts
 
                 if (dist <= attackRange)
                 {
-                    // Inside attack range: stop and attack
+                    
                     if (_aiPath != null) _aiPath.canMove = false;
 
                     if (_attackTimer <= 0)
@@ -120,7 +124,7 @@ namespace Project.Scripts
                 }
                 else
                 {
-                    // Outside attack range but inside chase range: resume movement
+                    
                     if (_moveResumeTimer <= 0 && _aiPath != null)
                     {
                         _aiPath.canMove = true;
@@ -131,7 +135,7 @@ namespace Project.Scripts
             {
                 if (_setter != null && _setter.target != null)
                 {
-                    // Transition from chasing to searching
+                    
                     _setter.target = null;
                     _aiPath.destination = _lastSeenPosition;
                     _isSearching = true;
@@ -203,7 +207,7 @@ namespace Project.Scripts
             Vector2 dirToPlayer = (_player.position - transform.position).normalized;
             float dist = Vector2.Distance(transform.position, _player.position);
 
-            // FOV check
+            
             if (fovAngle < 360f)
             {
                 float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
@@ -211,7 +215,7 @@ namespace Project.Scripts
                 if (Vector2.Angle(forward, dirToPlayer) > fovAngle * 0.5f) return false;
             }
 
-            // Obstacle check
+            
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dirToPlayer, dist);
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
@@ -233,23 +237,35 @@ namespace Project.Scripts
                 _animator.SetTrigger(attackTrigger);
             }
 
-            // Stop movement when attacking
+            if (audioSource != null && swingSound != null)
+            {
+                audioSource.PlayOneShot(swingSound);
+            }
+
+            
             if (_aiPath != null)
             {
                 _aiPath.canMove = false;
                 _moveResumeTimer = 0.5f; 
             }
 
-            // Damage logic
+            
             Vector3 point = attackPoint != null ? attackPoint.position : transform.position;
             Collider2D[] hitColliders = Physics2D.OverlapCircleAll(point, attackRadius, targetLayers);
             
+            bool hitAny = false;
             foreach (var hit in hitColliders)
             {
                 if (hit.TryGetComponent<Health>(out var health))
                 {
                     health.TakeDamage(damage);
+                    hitAny = true;
                 }
+            }
+
+            if (hitAny && audioSource != null && hitSound != null)
+            {
+                audioSource.PlayOneShot(hitSound);
             }
         }
 

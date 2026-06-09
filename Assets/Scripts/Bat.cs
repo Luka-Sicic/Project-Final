@@ -9,27 +9,39 @@ public class Bat : Weapon
     public LayerMask enemyLayers;
     public string attackTrigger = "batAttack";
 
+    [Header("Bat Audio")]
+    public AudioClip swingSound;
+    public AudioClip hitSound;
+
     private Animator animator;
 
     void Start()
     {
         animator = GetComponentInParent<Animator>();
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     public override void Fire()
     {
-        // Trigger animation
+        
+        if (audioSource != null && swingSound != null)
+        {
+            audioSource.PlayOneShot(swingSound);
+        }
+
+        
         if (animator != null)
         {
             animator.SetTrigger(attackTrigger);
         }
 
-        // Melee logic
+        
         Vector3 point = attackPoint != null ? attackPoint.position : transform.position;
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(point, attackRange, enemyLayers);
 
         Debug.Log($"Bat swung at {point}. Found {hitEnemies.Length} colliders on layers {enemyLayers.value}");
 
+        bool hitSomething = false;
         foreach (Collider2D enemy in hitEnemies)
         {
             Health health = enemy.GetComponent<Health>();
@@ -37,11 +49,17 @@ public class Bat : Weapon
             {
                 Debug.Log($"Hit enemy: {enemy.name}");
                 health.TakeDamage(1);
+                hitSomething = true;
             }
             else
             {
                 Debug.Log($"Hit object {enemy.name} but it has no Health component.");
             }
+        }
+
+        if (hitSomething && audioSource != null && hitSound != null)
+        {
+            audioSource.PlayOneShot(hitSound);
         }
     }
 

@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: -5828726092008307832}
   - component: {fileID: 7613961332693581152}
   - component: {fileID: 5468752625348536774}
+  - component: {fileID: 216339020513670943}
   m_Layer: 10
   m_Name: EnemyBat
   m_TagString: Untagged
@@ -187,7 +188,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0.019990698}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: -0.23913044, y: 0.46226412}
+    pivot: {x: 0.5242146, y: 0.64352137}
     oldSize: {x: 0.46, y: 1.06}
     newSize: {x: 0.38, y: 0.68}
     adaptiveTilingThreshold: 0.5
@@ -237,7 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: AstarPathfindingProject::Pathfinding.AIPath
   version: 5
-  radius: 0.2
+  radius: 0.3
   height: 2
   canMove: 1
   maxSpeed: 3
@@ -294,7 +295,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.Health
   maxHealth: 1
   deathSprite: {fileID: -1049424526154432507, guid: 8b7b411661fa5eb459555faf9efef61b, type: 3}
-  dropPrefab: {fileID: 0}
+  dropPrefab: {fileID: 6771746359702508549, guid: ec8e562bf3dfe5048b5a9bb02134b268, type: 3}
   bloodSprites:
   - {fileID: -8801263648035040421, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
   - {fileID: 3721750585631302050, guid: 0012fff825b199e40a2c96e4c3c27645, type: 3}
@@ -350,6 +351,9 @@ MonoBehaviour:
     m_Bits: 512
   attackTrigger: Attack
   staticSprite: {fileID: 1717480345832749148, guid: 282f18bc6a2200745b76fd611361f938, type: 3}
+  audioSource: {fileID: 216339020513670943}
+  swingSound: {fileID: 8300000, guid: c11c3771be9f58d4eb2a21c3f5c50d7a, type: 3}
+  hitSound: {fileID: 8300000, guid: 3ea0c3149257c644b977f0d6abac3587, type: 3}
   patrolPoints: []
   patrolWaitTime: 1
 --- !u!114 &5468752625348536774
@@ -366,3 +370,100 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Project.Scripts.EnemyContactDamage
   damage: 1
   damageInterval: 1
+--- !u!82 &216339020513670943
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6735760204460061288}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

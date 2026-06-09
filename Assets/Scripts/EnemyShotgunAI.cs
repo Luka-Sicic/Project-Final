@@ -25,6 +25,10 @@ namespace Project.Scripts
         [Header("Visuals")]
         public Sprite staticSprite;
 
+        [Header("Audio")]
+        public AudioSource audioSource;
+        public AudioClip[] fireSounds;
+
         [Header("Patrol")]
         public Transform[] patrolPoints;
         public float patrolWaitTime = 1f;
@@ -96,14 +100,14 @@ namespace Project.Scripts
 
         void Update()
         {
-            // Update timers
+            
             if (_moveResumeTimer > 0) _moveResumeTimer -= Time.deltaTime;
             if (_fireTimer > 0) _fireTimer -= Time.deltaTime;
 
             float dist = _player != null ? Vector2.Distance(transform.position, _player.position) : float.MaxValue;
             bool canSee = _player != null && HasLineOfSight() && dist <= chaseRange;
 
-            // Movement and Targeting Logic
+            
             if (canSee)
             {
                 _lastSeenPosition = _player.position;
@@ -114,7 +118,7 @@ namespace Project.Scripts
 
                 if (dist <= shootRange)
                 {
-                    // Inside shooting range: stop and attack
+                    
                     if (_aiPath != null) _aiPath.canMove = false;
 
                     if (_fireTimer <= 0)
@@ -125,7 +129,7 @@ namespace Project.Scripts
                 }
                 else
                 {
-                    // Outside shooting range but inside chase range: resume movement if recoil over
+                    
                     if (_moveResumeTimer <= 0 && _aiPath != null)
                     {
                         _aiPath.canMove = true;
@@ -136,7 +140,7 @@ namespace Project.Scripts
             {
                 if (_setter != null && _setter.target != null)
                 {
-                    // Transition from chasing to searching
+                    
                     _setter.target = null;
                     _aiPath.destination = _lastSeenPosition;
                     _isSearching = true;
@@ -183,7 +187,7 @@ namespace Project.Scripts
         {
             if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-            // Ensure index is valid
+            
             if (_currentPatrolIndex < 0 || _currentPatrolIndex >= patrolPoints.Length) _currentPatrolIndex = 0;
             if (patrolPoints[_currentPatrolIndex] == null) return;
 
@@ -208,12 +212,12 @@ namespace Project.Scripts
             Vector2 dirToPlayer = (_player.position - transform.position).normalized;
             float dist = Vector2.Distance(transform.position, _player.position);
 
-            // FOV check
+            
             float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
             Vector2 forward = new Vector2(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle));
             if (Vector2.Angle(forward, dirToPlayer) > fovAngle * 0.5f) return false;
 
-            // Obstacle & Locked Door check
+            
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dirToPlayer, dist);
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
@@ -222,10 +226,10 @@ namespace Project.Scripts
                 if (hit.collider.gameObject == gameObject) continue;
                 if (hit.collider.CompareTag("Player")) return true;
 
-                // Check if it's a wall/obstacle
+                
                 if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0) return false;
 
-                // Check if it's a locked door
+                
                 if (hit.collider.TryGetComponent<Door>(out var door) && door.isLocked) return false;
             }
 
@@ -236,7 +240,12 @@ namespace Project.Scripts
         {
             if (bulletPrefab == null) return;
 
-            // Stop movement when firing
+            if (audioSource != null && fireSounds != null && fireSounds.Length > 0)
+            {
+                audioSource.PlayOneShot(fireSounds[Random.Range(0, fireSounds.Length)]);
+            }
+
+            
             if (_aiPath != null)
             {
                 _aiPath.canMove = false;
@@ -249,16 +258,16 @@ namespace Project.Scripts
             for (int i = 0; i < pelletCount; i++)
             {
                 float currentAngle = startAngle + (angleStep * i);
-                // Rotate firePoint.right by currentAngle
+                
                 Quaternion rotation = transform.rotation * Quaternion.Euler(0, 0, currentAngle - rotationOffset);
                 
                 GameObject bullet = Instantiate(bulletPrefab, firePoint.position, rotation);
                 Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
                 if (rb != null)
                 {
-                    // In 2D, transform.right is often the forward direction.
-                    // But we used rotationOffset. 
-                    // Let's use the rotation we just calculated.
+                    
+                    
+                    
                     rb.linearVelocity = (Vector2)(rotation * Vector3.right) * bulletSpeed;
                 }
             }
@@ -271,12 +280,12 @@ namespace Project.Scripts
             Vector2 direction = Vector2.zero;
             if (_setter.target != null)
             {
-                // Rotate towards player if we are chasing
+                
                 direction = (_player.position - transform.position).normalized;
             }
             else if (_aiPath.velocity.sqrMagnitude > 0.1f)
             {
-                // Rotate towards movement direction if not chasing but moving
+                
                 direction = _aiPath.velocity.normalized;
             }
 

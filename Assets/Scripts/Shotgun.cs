@@ -20,9 +20,11 @@ public class Shotgun : Weapon
 
         ammo--;
 
+        PlayFireSound();
+
         NoiseManager.MakeNoise(transform.position, noiseRadius);
 
-        // Fires only one bullet in the direction of the firePoint
+        
 GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         if (rb != null)

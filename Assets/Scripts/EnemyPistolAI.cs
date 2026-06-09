@@ -23,6 +23,10 @@ namespace Project.Scripts
         [Header("Visuals")]
         public Sprite staticSprite;
 
+        [Header("Audio")]
+        public AudioSource audioSource;
+        public AudioClip[] fireSounds;
+
         [Header("Patrol")]
         public Transform[] patrolPoints;
         public float patrolWaitTime = 1f;
@@ -94,14 +98,14 @@ namespace Project.Scripts
 
         void Update()
         {
-            // Update timers
+            
             if (_moveResumeTimer > 0) _moveResumeTimer -= Time.deltaTime;
             if (_fireTimer > 0) _fireTimer -= Time.deltaTime;
 
             float dist = _player != null ? Vector2.Distance(transform.position, _player.position) : float.MaxValue;
             bool canSee = _player != null && HasLineOfSight() && dist <= chaseRange;
 
-            // Movement and Targeting Logic
+            
             if (canSee)
             {
                 _lastSeenPosition = _player.position;
@@ -112,7 +116,7 @@ namespace Project.Scripts
 
                 if (dist <= shootRange)
                 {
-                    // Inside shooting range: stop and attack
+                    
                     if (_aiPath != null) _aiPath.canMove = false;
 
                     if (_fireTimer <= 0)
@@ -123,7 +127,7 @@ namespace Project.Scripts
                 }
                 else
                 {
-                    // Outside shooting range but inside chase range: resume movement
+                    
                     if (_moveResumeTimer <= 0 && _aiPath != null)
                     {
                         _aiPath.canMove = true;
@@ -134,7 +138,7 @@ namespace Project.Scripts
             {
                 if (_setter != null && _setter.target != null)
                 {
-                    // Transition from chasing to searching
+                    
                     _setter.target = null;
                     _aiPath.destination = _lastSeenPosition;
                     _isSearching = true;
@@ -226,6 +230,11 @@ namespace Project.Scripts
         void Shoot()
         {
             if (bulletPrefab == null) return;
+
+            if (audioSource != null && fireSounds != null && fireSounds.Length > 0)
+            {
+                audioSource.PlayOneShot(fireSounds[Random.Range(0, fireSounds.Length)]);
+            }
 
             if (_aiPath != null)
             {

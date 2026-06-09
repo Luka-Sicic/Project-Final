@@ -42,7 +42,7 @@ public class WeaponPickup : MonoBehaviour
                 float currentDist = Vector2.Distance(currentInteractable.transform.position, player.transform.position);
                 if (distance < currentDist)
                 {
-                    // Swapping to a closer one
+                    
                     if (currentInteractable.canvasPrompt != null) 
                         currentInteractable.canvasPrompt.SetActive(false);
                     currentInteractable = this;
@@ -83,7 +83,7 @@ public class WeaponPickup : MonoBehaviour
             return;
         }
 
-        // Check if player already has this weapon type
+        
         Weapon prefabWeapon = weaponPrefab.GetComponent<Weapon>();
         if (player.weapon != null && player.weapon.GetType() == prefabWeapon.GetType())
         {
@@ -100,10 +100,10 @@ Weapon weaponScript = weaponInstance.GetComponent<Weapon>();
             player.EquipWeapon(weaponScript);
         }
 
-        // Handle Animations
+        
         if (player.animator != null)
         {
-            // Reset common weapon bools to ensure only the new one is active
+            
             player.animator.SetBool("HasShotgun", false);
             player.animator.SetBool("HasPistol", false);
             player.animator.SetBool("HasBat", false);

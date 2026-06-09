@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Project.Scripts
 {
-    /// <summary>
-    /// Handles security camera behavior: oscillation, player detection, and alerting.
-    /// </summary>
+    
+    
+    
     public class SecurityCamera : MonoBehaviour
     {
         [Header("Oscillation")]
@@ -52,7 +52,7 @@ namespace Project.Scripts
                 _playerTransform = player.transform;
             }
 
-            // Initial sync
+            
             if (_visionCone != null)
             {
                 _visionCone.SetFov(fov);
@@ -70,7 +70,7 @@ namespace Project.Scripts
 
         private void UpdateOscillation()
         {
-            // Use Mathf.Sin for smooth oscillation between -range and +range
+            
             float angle = _baseRotation + Mathf.Sin(Time.time * oscillationSpeed) * oscillationRange;
             transform.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
         }
@@ -89,8 +89,8 @@ namespace Project.Scripts
             }
             else
             {
-                // Decay the detection timer when the player is out of view, 
-                // instead of resetting it instantly. This makes detection more robust.
+                
+                
                 _detectionTimer = Mathf.Max(0, _detectionTimer - Time.deltaTime);
                 if (_detectionTimer <= 0)
                 {
@@ -104,14 +104,14 @@ namespace Project.Scripts
             Vector3 directionToPlayer = _playerTransform.position - transform.position;
             float distanceToPlayer = directionToPlayer.magnitude;
 
-            // 1. Distance check
+            
             if (distanceToPlayer > viewDistance) return false;
 
-            // 2. FOV check (using transform.right as the forward direction)
+            
             float angleToPlayer = Vector3.Angle(transform.right, directionToPlayer);
             if (angleToPlayer > fov / 2f) return false;
 
-            // 3. Line of Sight check
+            
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer.normalized, distanceToPlayer, obstacleLayer);
             if (hit.collider != null && !hit.collider.CompareTag(playerTag))
             {
@@ -125,8 +125,8 @@ namespace Project.Scripts
         {
             _isAlerted = true;
             
-            // Make noise at the player's location so enemies go there, 
-            // but use a radius large enough to reach nearby guards.
+            
+            
             Vector2 alertLocation = _playerTransform != null ? (Vector2)_playerTransform.position : (Vector2)transform.position;
             NoiseManager.MakeNoise(alertLocation, alertRadius);
             
@@ -137,18 +137,18 @@ namespace Project.Scripts
         {
             if (_visionCone == null) return;
 
-            // Sync mesh properties
+            
             _visionCone.SetFov(fov);
             _visionCone.SetViewDistance(viewDistance);
 
-            // Update color based on state
+            
             if (_isAlerted)
             {
                 _visionCone.SetColor(alertColor);
             }
             else if (_detectionTimer > 0)
             {
-                // Optionally interpolate color as detection increases
+                
                 float t = _detectionTimer / detectionTime;
                 _visionCone.SetColor(Color.Lerp(detectingColor, alertColor, t));
             }

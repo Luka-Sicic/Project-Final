@@ -28,13 +28,13 @@ namespace Project.Scripts
             _meshRenderer = GetComponent<MeshRenderer>();
             _meshFilter.mesh = _mesh;
 
-            // Ensure a material is assigned if none exists
+            
             if (_meshRenderer.sharedMaterial == null)
             {
                 _meshRenderer.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default"));
             }
 
-            // Set default sorting if not set
+            
             if (_meshRenderer.sortingLayerName == "Default" && _meshRenderer.sortingOrder == 0)
             {
                 _meshRenderer.sortingLayerName = "Ground";
@@ -64,7 +64,7 @@ namespace Project.Scripts
 
         private void UpdateMesh()
         {
-            int vertexCount = rayCount + 1 + 1; // +1 for origin, +1 for starting ray
+            int vertexCount = rayCount + 1 + 1; 
             if (_vertices == null || _vertices.Length != vertexCount)
             {
                 _vertices = new Vector3[vertexCount];
@@ -100,7 +100,7 @@ namespace Project.Scripts
                 _vertices[i + 1] = vertex;
                 _colors[i + 1] = _currentColor;
                 
-                // Simple UV mapping
+                
                 _uv[i + 1] = new Vector2(0.5f + vertex.x / (viewDistance * 2), 0.5f + vertex.y / (viewDistance * 2));
 
                 if (i < rayCount)

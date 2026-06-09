@@ -12,6 +12,7 @@ namespace Project.Scripts
         [SerializeField] private float bloodOffsetRange = 0.2f;
         
         private int _currentHealth;
+        private bool _isDead;
 
         private void Start()
         {
@@ -20,6 +21,8 @@ namespace Project.Scripts
 
         public void TakeDamage(int amount)
         {
+            if (_isDead) return;
+
             if (amount > 0 && canBleed)
             {
                 SpawnBlood();
@@ -54,22 +57,25 @@ namespace Project.Scripts
 
         private void Die()
         {
+            if (_isDead) return;
+            _isDead = true;
+
             if (dropPrefab != null)
             {
                 Instantiate(dropPrefab, transform.position, Quaternion.identity);
             }
 
-            // Create a new object for the corpse
+            
             GameObject corpse = new GameObject(name + "_Corpse");
             corpse.transform.position = transform.position;
             corpse.transform.rotation = transform.rotation;
             corpse.transform.localScale = transform.localScale;
 
-            // Add SpriteRenderer and configure it
+            
             SpriteRenderer sr = corpse.AddComponent<SpriteRenderer>();
             sr.sprite = deathSprite;
             
-            // Match sorting layer and order from the original object
+            
             SpriteRenderer originalSR = GetComponent<SpriteRenderer>();
             if (originalSR != null)
             {

@@ -59,7 +59,7 @@ namespace Project.Scripts
 
             if (_aiPath != null)
             {
-                // Disable AIPath's internal rotation so we can handle it manually with the offset.
+                
                 _aiPath.enableRotation = false;
             }
 
@@ -84,7 +84,7 @@ namespace Project.Scripts
             {
                 Vector2 dirToPlayer = ((Vector2)_player.position - (Vector2)transform.position).normalized;
                 
-                // Determine 'forward' based on the transform's current rotation minus the offset.
+                
                 float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
                 Vector2 forward = new Vector2(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle));
 
@@ -110,7 +110,7 @@ namespace Project.Scripts
             {
                 if (_setter != null && _setter.target != null)
                 {
-                    // Transition from chasing to searching
+                    
                     _setter.target = null;
                     _aiPath.destination = _lastSeenPosition;
                     _isSearching = true;
@@ -146,7 +146,7 @@ namespace Project.Scripts
         {
             if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-            // Ensure index is valid
+            
             if (_currentPatrolIndex < 0 || _currentPatrolIndex >= patrolPoints.Length) _currentPatrolIndex = 0;
             if (patrolPoints[_currentPatrolIndex] == null) return;
 
@@ -175,7 +175,7 @@ namespace Project.Scripts
                 _animator.SetBool("IsWalking", _aiPath.velocity.sqrMagnitude > 0.01f);
             }
 
-            // Smoothly rotate the transform towards the movement direction, plus the offset.
+            
             if (_aiPath.velocity.sqrMagnitude > 0.1f)
             {
                 float targetAngle = Mathf.Atan2(_aiPath.velocity.y, _aiPath.velocity.x) * Mathf.Rad2Deg;
@@ -190,7 +190,7 @@ namespace Project.Scripts
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, chaseRange);
             
-            // Draw FOV lines
+            
             float currentFacingAngle = (transform.eulerAngles.z - rotationOffset) * Mathf.Deg2Rad;
             Vector3 forward = new Vector3(Mathf.Cos(currentFacingAngle), Mathf.Sin(currentFacingAngle), 0);
             Vector3 leftRay = Quaternion.Euler(0, 0, fovAngle * 0.5f) * forward;
@@ -209,10 +209,10 @@ namespace Project.Scripts
 
         private bool HasLineOfSight(Vector2 dirToPlayer, float dist)
         {
-            // Use RaycastAll to check for both obstacles and locked doors
+            
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dirToPlayer, dist);
             
-            // Sort hits by distance
+            
             System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
             foreach (var hit in hits)
@@ -220,10 +220,10 @@ namespace Project.Scripts
                 if (hit.collider.gameObject == gameObject) continue;
                 if (hit.collider.CompareTag("Player")) return true;
 
-                // Check if it's a wall/obstacle
+                
                 if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0) return false;
 
-                // Check if it's a locked door
+                
                 if (hit.collider.TryGetComponent<Door>(out var door) && door.isLocked) return false;
             }
 

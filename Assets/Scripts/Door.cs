@@ -7,6 +7,8 @@ public class Door : MonoBehaviour, IInteractable
     [Header("Door Settings")]
     public bool isLocked = false;
     public float kickForce = 500f;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _kickSound;
 
     private Rigidbody2D rb;
     private HingeJoint2D hinge;
@@ -78,30 +80,35 @@ public class Door : MonoBehaviour, IInteractable
     public void Kick(Vector2 kickerPosition)
     {
         if (_hasBeenOpened) return;
+
+        if (_audioSource != null && _kickSound != null)
+        {
+            _audioSource.PlayOneShot(_kickSound);
+        }
         
-        lethalTimer = 1.0f; // Door is lethal for 1.0 seconds after being kicked
+        lethalTimer = 1.0f; 
         if (isLocked) UnlockDoor();
         _hasBeenOpened = true;
         
         if (rb != null)
         {
-            // Ensure the rigidbody is awake and dynamic
+            
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.WakeUp();
             
-            // Calculate direction from kicker to door center
+            
             Vector2 doorCenter = rb.worldCenterOfMass;
             Vector2 direction = (doorCenter - kickerPosition).normalized;
             
-            // Apply force at the center of mass in the direction away from the kicker.
-            // Using Impulse for immediate movement.
+            
+            
             rb.AddForceAtPosition(direction * kickForce, doorCenter, ForceMode2D.Impulse);
             
-            // Log for debugging
+            
             Debug.Log("[Door] Kicked door: " + name + " with force " + kickForce);
 
-            // NEW: Immediate check for enemies already overlapping/touching the door.
-            // This is critical for locked doors that were static and didn't have active physics contacts.
+            
+            
             CheckImmediateCollisions();
         }
     }
@@ -128,7 +135,7 @@ public class Door : MonoBehaviour, IInteractable
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        // If lethal timer is active, treat stay as an enter to catch already-touching enemies
+        
         if (lethalTimer > 0)
         {
             HandleLethalCollision(collision.gameObject);
@@ -147,14 +154,14 @@ public class Door : MonoBehaviour, IInteractable
     {
         Debug.Log("[Door] Collision while lethal with: " + other.name + " (Layer: " + LayerMask.LayerToName(other.layer) + ")");
 
-        // Don't kill other doors
+        
         if (other.GetComponentInParent<Door>() != null) 
         {
             Debug.Log("[Door] Ignored (Door)");
             return;
         }
 
-        // Don't kill the player
+        
         if (other.CompareTag("Player") || other.GetComponentInParent<PlayerController>() != null) 
         {
             Debug.Log("[Door] Ignored (Player)");

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Project.Scripts;
 
 public class PlayerController : MonoBehaviour
@@ -8,8 +9,15 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;
     public Animator animator;
 
+    [Header("Input Actions")]
+    [SerializeField] private InputActionReference moveAction;
+    [SerializeField] private InputActionReference attackAction;
+    [SerializeField] private InputActionReference kickAction;
+    [SerializeField] private InputActionReference reloadAction;
+    [SerializeField] private InputActionReference interactAction;
+
     [Header("Kick Settings")]
-    public float kickRange = 0.8f;
+public float kickRange = 0.8f;
     public int kickDamage = 0; 
     public float kickForce = 5f;
     public LayerMask kickLayers;
@@ -20,6 +28,24 @@ public class PlayerController : MonoBehaviour
     
     private static readonly int IsWalkingHash = Animator.StringToHash("IsWalking");
     private static readonly int PlayerKickHash = Animator.StringToHash("playerkick");
+
+    void OnEnable()
+    {
+        if (moveAction != null) moveAction.action.Enable();
+        if (attackAction != null) attackAction.action.Enable();
+        if (kickAction != null) kickAction.action.Enable();
+        if (reloadAction != null) reloadAction.action.Enable();
+        if (interactAction != null) interactAction.action.Enable();
+    }
+
+    void OnDisable()
+    {
+        if (moveAction != null) moveAction.action.Disable();
+        if (attackAction != null) attackAction.action.Disable();
+        if (kickAction != null) kickAction.action.Disable();
+        if (reloadAction != null) reloadAction.action.Disable();
+        if (interactAction != null) interactAction.action.Disable();
+    }
 
     void Start()
     {
@@ -33,18 +59,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-        moveDirection = new Vector2(moveX, moveY).normalized;
+        if (moveAction != null)
+        {
+            moveDirection = moveAction.action.ReadValue<Vector2>().normalized;
+        }
 
-        if (Input.GetMouseButtonDown(0) && weapon != null && !weapon.IsReloading)
+        if (attackAction != null && attackAction.action.WasPressedThisFrame() && weapon != null && !weapon.IsReloading)
             weapon.Fire();
 
-        if (Input.GetKeyDown(KeyCode.R) && weapon != null)
+        if (reloadAction != null && reloadAction.action.WasPressedThisFrame() && weapon != null)
             weapon.Reload();
 
-        if (Input.GetKeyDown(KeyCode.Q))
-{
+        if (kickAction != null && kickAction.action.WasPressedThisFrame())
+        {
             Kick();
         }
 

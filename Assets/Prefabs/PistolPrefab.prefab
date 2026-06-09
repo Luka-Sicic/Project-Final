@@ -68,7 +68,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 025b3b52af27ace4fb4a40547fe767a0, type: 3}
   bulletPrefab: {fileID: 1171446466900999360, guid: 173c17ca457bad343b805ec9b9800cfb, type: 3}
   firePoint: {fileID: 8014051875537838653}
-  bulletSpeed: 20
+  bulletSpeed: 30
 --- !u!82 &873838773134782161
 AudioSource:
   m_ObjectHideFlags: 0

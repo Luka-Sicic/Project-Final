@@ -1,13 +1,15 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class WeaponPickup : MonoBehaviour
 {
     [Header("Settings")]
     public GameObject weaponPrefab;
     public float pickupDistance = 2f;
+    [SerializeField] private InputActionReference interactAction;
     
     [Header("Animation")]
-    public string animTrigger;
+public string animTrigger;
     public string animBool;
 
     [Header("UI")]
@@ -18,8 +20,16 @@ public class WeaponPickup : MonoBehaviour
     private static float nextPickupTime = 0f;
     private const float GlobalPickupCooldown = 0.2f;
 
-    void Start()
+    private void OnEnable()
     {
+    }
+
+    private void OnDisable()
+    {
+    }
+
+    void Start()
+{
         player = Object.FindAnyObjectByType<PlayerController>();
         if (canvasPrompt != null) canvasPrompt.SetActive(false);
     }
@@ -60,12 +70,13 @@ public class WeaponPickup : MonoBehaviour
             if (canvasPrompt != null && !canvasPrompt.activeSelf) 
                 canvasPrompt.SetActive(true);
             
-            if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextPickupTime)
+            bool interactPressed = interactAction != null && interactAction.action.WasPressedThisFrame();
+            if (interactPressed && Time.time >= nextPickupTime)
             {
                 nextPickupTime = Time.time + GlobalPickupCooldown;
                 PickUp();
             }
-        }
+}
     }
 
     void PickUp()

@@ -10,7 +10,7 @@ namespace Project.Scripts.UI
 
         public void NewGame()
         {
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("Level1");
         }
 
         public void LoadGame()

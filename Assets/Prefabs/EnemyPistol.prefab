@@ -360,7 +360,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 1317194511853855486, guid: 12e8061f9fe30464da0167ee03cbe22e, type: 3}
   firePoint: {fileID: 3535003502279088723}
   fireRate: 0.5
-  bulletSpeed: 18
+  bulletSpeed: 30
   staticSprite: {fileID: -1273938104294769392, guid: 877d6b581ba9e4044801de8a68965f4c, type: 3}
   audioSource: {fileID: 3228501856256128366}
   fireSounds:

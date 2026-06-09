@@ -175,6 +175,11 @@ MonoBehaviour:
   weapon: {fileID: 0}
   rb: {fileID: 5860062040736380976}
   animator: {fileID: 0}
+  moveAction: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  attackAction: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  kickAction: {fileID: 6995196066142002883, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  reloadAction: {fileID: 1764256351850261319, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   kickRange: 0.8
   kickDamage: 0
   kickForce: 15

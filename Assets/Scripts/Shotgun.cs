@@ -24,12 +24,17 @@ public class Shotgun : Weapon
 
         NoiseManager.MakeNoise(transform.position, noiseRadius);
 
-        
-GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        if (rb != null)
+        for (int i = 0; i < pelletCount; i++)
         {
-            rb.linearVelocity = firePoint.right * bulletSpeed;
+            float randomSpread = Random.Range(-spreadAngle, spreadAngle);
+            Quaternion spreadRotation = firePoint.rotation * Quaternion.Euler(0, 0, randomSpread);
+            
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, spreadRotation);
+            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = (Vector2)(spreadRotation * Vector3.right) * bulletSpeed;
+            }
         }
     }
 }

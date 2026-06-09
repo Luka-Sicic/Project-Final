@@ -336,7 +336,7 @@ MonoBehaviour:
   fireRate: 1.5
   pelletCount: 1
   spreadAngle: 0
-  bulletSpeed: 15
+  bulletSpeed: 30
   staticSprite: {fileID: -7016851391815386805, guid: c7bc6eb71f14d0a409b246482e0feede, type: 3}
   audioSource: {fileID: 6328541564438119636}
   fireSounds:

@@ -14,8 +14,10 @@ namespace Project.Scripts
         private int _currentHealth;
         private bool _isDead;
 
+        public static System.Action OnPlayerDeath;
+
         private void Start()
-        {
+{
             _currentHealth = maxHealth;
         }
 
@@ -60,8 +62,13 @@ namespace Project.Scripts
             if (_isDead) return;
             _isDead = true;
 
-            if (dropPrefab != null)
+            if (CompareTag("Player"))
             {
+                OnPlayerDeath?.Invoke();
+            }
+
+            if (dropPrefab != null)
+{
                 Instantiate(dropPrefab, transform.position, Quaternion.identity);
             }
 

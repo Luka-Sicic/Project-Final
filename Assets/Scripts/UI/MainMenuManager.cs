@@ -10,12 +10,20 @@ namespace Project.Scripts.UI
 
         public void NewGame()
         {
+            GameSaveManager.ClearSave();
             SceneManager.LoadScene("Level1");
         }
 
         public void LoadGame()
         {
-            Debug.Log("Load Game clicked - Not implemented");
+            if (GameSaveManager.HasSave())
+            {
+                GameSaveManager.LoadGame();
+            }
+            else
+            {
+                Debug.Log("No save game found");
+            }
         }
 
         public void OpenSettings()

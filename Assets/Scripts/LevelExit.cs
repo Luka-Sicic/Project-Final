@@ -75,6 +75,13 @@ public class LevelExit : MonoBehaviour
 
         if (canvasPrompt != null) canvasPrompt.SetActive(false);
 
+        
+        if (player != null && player.weapon != null)
+        {
+            string weaponName = player.weapon.gameObject.name.Replace("(Clone)", "").Trim();
+            Project.Scripts.GameSaveManager.SaveWeapon(weaponName);
+        }
+
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
 

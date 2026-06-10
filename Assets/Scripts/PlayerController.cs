@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;
     public Animator animator;
 
+    [Header("Weapon Settings")]
+    [SerializeField] private GameObject[] allWeaponPrefabs;
+
     [Header("Input Actions")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference attackAction;
@@ -52,8 +55,45 @@ public float kickRange = 0.8f;
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (animator == null) animator = GetComponent<Animator>();
         
-        
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+
+        LoadSavedWeapon();
+    }
+
+    private void LoadSavedWeapon()
+    {
+        string savedWeaponName = Project.Scripts.GameSaveManager.GetSavedWeapon();
+        if (string.IsNullOrEmpty(savedWeaponName)) return;
+
+        foreach (GameObject prefab in allWeaponPrefabs)
+        {
+            if (prefab.name == savedWeaponName)
+            {
+                GameObject weaponInstance = Instantiate(prefab);
+                Weapon newWeapon = weaponInstance.GetComponent<Weapon>();
+                if (newWeapon != null)
+                {
+                    EquipWeapon(newWeapon);
+                    
+                    
+                    UpdateAnimatorBools(savedWeaponName);
+                }
+                break;
+            }
+        }
+    }
+
+    private void UpdateAnimatorBools(string weaponName)
+    {
+        if (animator == null) return;
+
+        animator.SetBool("HasShotgun", false);
+        animator.SetBool("HasPistol", false);
+        animator.SetBool("HasBat", false);
+
+        if (weaponName.Contains("Shotgun")) animator.SetBool("HasShotgun", true);
+        else if (weaponName.Contains("Pistol")) animator.SetBool("HasPistol", true);
+        else if (weaponName.Contains("Bat")) animator.SetBool("HasBat", true);
     }
 
     void Update()

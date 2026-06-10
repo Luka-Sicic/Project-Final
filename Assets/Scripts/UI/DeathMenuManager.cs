@@ -53,7 +53,7 @@ namespace Project.Scripts.UI
 
             Time.timeScale = 0f;
             
-            // Unlock and show cursor
+            
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             Debug.Log("[DeathMenuManager] Time.timeScale set to 0 and cursor unlocked");
@@ -68,7 +68,7 @@ namespace Project.Scripts.UI
         public void LoadMainMenu()
         {
             Time.timeScale = 1f;
-            SceneManager.LoadScene(0); // Assuming MainMenu is at index 0
+            SceneManager.LoadScene(0); 
         }
     }
 }
